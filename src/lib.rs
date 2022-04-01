@@ -173,7 +173,7 @@ pub use crate::error::Error;
 //
 // These should all provide getrandom_inner with the same signature as getrandom.
 cfg_if! {
-    if #[cfg(target_os = "optee")] {
+    if #[cfg(target = "optee")] {
         #[path = "optee.rs"] mod imp;
     } else if #[cfg(any(target_os = "emscripten", target_os = "haiku",
                  target_os = "redox"))] {
