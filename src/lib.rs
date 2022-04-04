@@ -10,30 +10,31 @@
 //!
 //! # Supported targets
 //!
-//! | Target                | Target Triple                      | Implementation
-//! | --------------------- | ---------------------------------- | --------------
-//! | Linux, Android        | `*‑linux‑*`                        | [`getrandom`][1] system call if available, otherwise [`/dev/urandom`][2] after successfully polling `/dev/random`
-//! | Windows               | `*‑windows‑*`                      | [`BCryptGenRandom`]
-//! | macOS                 | `*‑apple‑darwin`                   | [`getentropy`][3] if available, otherwise [`/dev/random`][4] (identical to `/dev/urandom`)
-//! | iOS                   | `*‑apple‑ios`                      | [`SecRandomCopyBytes`]
-//! | FreeBSD               | `*‑freebsd`                        | [`getrandom`][5] if available, otherwise [`kern.arandom`][6]
-//! | OpenBSD               | `*‑openbsd`                        | [`getentropy`][7]
-//! | NetBSD                | `*‑netbsd`                         | [`kern.arandom`][8]
-//! | Dragonfly BSD         | `*‑dragonfly`                      | [`getrandom`][9] if available, otherwise [`/dev/random`][10]
-//! | Solaris, illumos      | `*‑solaris`, `*‑illumos`           | [`getrandom`][11] if available, otherwise [`/dev/random`][12]
-//! | Fuchsia OS            | `*‑fuchsia`                        | [`cprng_draw`]
-//! | Redox                 | `*‑redox`                          | `/dev/urandom`
-//! | Haiku                 | `*‑haiku`                          | `/dev/random` (identical to `/dev/urandom`)
-//! | Hermit                | `x86_64-*-hermit`                  | [`RDRAND`]
-//! | SGX                   | `x86_64‑*‑sgx`                     | [`RDRAND`]
-//! | VxWorks               | `*‑wrs‑vxworks‑*`                  | `randABytes` after checking entropy pool initialization with `randSecure`
-//! | ESP-IDF               | `*‑espidf`                         | [`esp_fill_random`]
-//! | Emscripten            | `*‑emscripten`                     | `/dev/random` (identical to `/dev/urandom`)
-//! | WASI                  | `wasm32‑wasi`                      | [`random_get`]
-//! | Web Browser           | `wasm32‑*‑unknown`                 | [`Crypto.getRandomValues`], see [WebAssembly support]
-//! | Node.js               | `wasm32‑*‑unknown`                 | [`crypto.randomBytes`], see [WebAssembly support]
-//! | SOLID                 | `*-kmc-solid_*`                    | `SOLID_RNG_SampleRandomBytes`
-//! | Nintendo 3DS, OP-TEE  | `armv6k-nintendo-3ds`, `*-optee-*` | [`getrandom`][1]
+//! | Target            | Target Triple      | Implementation
+//! | ----------------- | ------------------ | --------------
+//! | Linux, Android    | `*‑linux‑*`        | [`getrandom`][1] system call if available, otherwise [`/dev/urandom`][2] after successfully polling `/dev/random`
+//! | Windows           | `*‑windows‑*`      | [`BCryptGenRandom`]
+//! | macOS             | `*‑apple‑darwin`   | [`getentropy`][3] if available, otherwise [`/dev/random`][4] (identical to `/dev/urandom`)
+//! | iOS               | `*‑apple‑ios`      | [`SecRandomCopyBytes`]
+//! | FreeBSD           | `*‑freebsd`        | [`getrandom`][5] if available, otherwise [`kern.arandom`][6]
+//! | OpenBSD           | `*‑openbsd`        | [`getentropy`][7]
+//! | NetBSD            | `*‑netbsd`         | [`kern.arandom`][8]
+//! | Dragonfly BSD     | `*‑dragonfly`      | [`getrandom`][9] if available, otherwise [`/dev/random`][10]
+//! | Solaris, illumos  | `*‑solaris`, `*‑illumos` | [`getrandom`][11] if available, otherwise [`/dev/random`][12]
+//! | Fuchsia OS        | `*‑fuchsia`        | [`cprng_draw`]
+//! | OP-TEE            | `*-optee-*`        | [`optee_utee::Random::generate`]
+//! | Redox             | `*‑redox`          | `/dev/urandom`
+//! | Haiku             | `*‑haiku`          | `/dev/random` (identical to `/dev/urandom`)
+//! | Hermit            | `x86_64-*-hermit`  | [`RDRAND`]
+//! | SGX               | `x86_64‑*‑sgx`     | [`RDRAND`]
+//! | VxWorks           | `*‑wrs‑vxworks‑*`  | `randABytes` after checking entropy pool initialization with `randSecure`
+//! | ESP-IDF           | `*‑espidf`         | [`esp_fill_random`]
+//! | Emscripten        | `*‑emscripten`     | `/dev/random` (identical to `/dev/urandom`)
+//! | WASI              | `wasm32‑wasi`      | [`random_get`]
+//! | Web Browser       | `wasm32‑*‑unknown` | [`Crypto.getRandomValues`], see [WebAssembly support]
+//! | Node.js           | `wasm32‑*‑unknown` | [`crypto.randomBytes`], see [WebAssembly support]
+//! | SOLID             | `*-kmc-solid_*`    | `SOLID_RNG_SampleRandomBytes`
+//! | Nintendo 3DS      | `armv6k-nintendo-3ds` | [`getrandom`][1]
 //!
 //! There is no blanket implementation on `unix` targets that reads from
 //! `/dev/urandom`. This ensures all supported targets are using the recommended
@@ -173,7 +174,7 @@ pub use crate::error::Error;
 //
 // These should all provide getrandom_inner with the same signature as getrandom.
 cfg_if! {
-    if #[cfg(target = "optee")] {
+    if #[cfg(target_os = "optee")] {
         #[path = "optee.rs"] mod imp;
     } else if #[cfg(any(target_os = "emscripten", target_os = "haiku",
                  target_os = "redox"))] {
