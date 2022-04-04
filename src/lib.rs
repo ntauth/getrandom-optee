@@ -22,6 +22,7 @@
 //! | Dragonfly BSD     | `*‑dragonfly`      | [`getrandom`][9] if available, otherwise [`/dev/random`][10]
 //! | Solaris, illumos  | `*‑solaris`, `*‑illumos` | [`getrandom`][11] if available, otherwise [`/dev/random`][12]
 //! | Fuchsia OS        | `*‑fuchsia`        | [`cprng_draw`]
+//! | OP-TEE            | `*-optee-*`        | [`optee_utee::Random::generate`]
 //! | Redox             | `*‑redox`          | `/dev/urandom`
 //! | Haiku             | `*‑haiku`          | `/dev/random` (identical to `/dev/urandom`)
 //! | Hermit            | `x86_64-*-hermit`  | [`RDRAND`]
@@ -172,7 +173,9 @@ pub use crate::error::Error;
 //
 // These should all provide getrandom_inner with the same signature as getrandom.
 cfg_if! {
-    if #[cfg(any(target_os = "emscripten", target_os = "haiku",
+    if #[cfg(target_os = "optee")] {
+        #[path = "optee.rs"] mod imp;
+    } else if #[cfg(any(target_os = "emscripten", target_os = "haiku",
                  target_os = "redox"))] {
         mod util_libc;
         #[path = "use_file.rs"] mod imp;
